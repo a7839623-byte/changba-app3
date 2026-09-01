@@ -1,7 +1,5 @@
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     namespace 'com.changba.assistant'
@@ -46,7 +44,7 @@ android {
 }
 
 dependencies {
-    // 🔴 讓 UI 能呈現精美繁中字體、圓角與現代美學的親兒子核心組件
+    // 🎨 Jetpack Compose 繁中絲滑 UI 核心套件
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.activity:activity-compose:1.8.2'
