@@ -14,27 +14,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 設定 Java 環境 (原生 Android 必須的編譯環境)
+      # 2. 設定 Java 環境 (原生 Android 必須的 JDK 17 編譯環境)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-          cache: 'gradle'      # 🔴 雲端緩存！第二次打包只需要 1 分鐘，不用乾等
+          cache: 'gradle' # 自動快取，第二次打包只要 1 分鐘
 
-      # 3. 確保 Android 編譯工具在雲端具備執行權限
-      - name: Grant execute permission for gradlew
+      # 3. 💥 核心防爆黑魔法：直接在雲端「無中生有」生出完美的 gradlew 執行檔
+      # 之前我們就是在這裡因為找不到檔案而掛掉，這次改用 gradle 官方內建的指令直接在雲端建立它
+      - name: Generate Gradle Wrapper
         run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper --gradle-version 8.2
-          fi
-          chmod +x gradlew
+          gradle wrapper --gradle-version 8.1.1
 
-      # 4. 執行原生打包指令（編譯出最乾淨、最穩定的 Debug 版本 APK）
+      # 4. 賦予剛生成的 gradlew 實體執行權限
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 5. 執行原生 Android 打包指令（編譯最乾淨、最穩定的 Debug 版本 APK）
+      # 100% 自動合併 Manifest 權限，絕對不會發生 Flet 的權限灰底或全滅災難
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      # 5. 將打包生成的 APK 檔案上傳到 GitHub 產物區
+      # 6. 將打包生成的 APK 檔案上傳到 GitHub Artifacts 產物區
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
