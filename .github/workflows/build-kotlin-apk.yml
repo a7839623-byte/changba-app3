@@ -1,0 +1,42 @@
+name: Build Android Kotlin APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 檢出 GitHub 倉庫中的程式碼
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 設定 Java 環境 (原生 Android 必須的編譯環境)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'      # 🔴 雲端緩存！第二次打包只需要 1 分鐘，不用乾等
+
+      # 3. 確保 Android 編譯工具在雲端具備執行權限
+      - name: Grant execute permission for gradlew
+        run: |
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper --gradle-version 8.2
+          fi
+          chmod +x gradlew
+
+      # 4. 執行原生打包指令（編譯出最乾淨、最穩定的 Debug 版本 APK）
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # 5. 將打包生成的 APK 檔案上傳到 GitHub 產物區
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changba-assistant-kotlin-apk
+          path: app/build/outputs/apk/debug/*.apk
