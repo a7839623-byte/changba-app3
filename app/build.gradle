@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+// 加上這一段，確保這個子專案能直接抓到依賴套件
+repositories {
+    google()
+    mavenCentral()
+}
+
 android {
     namespace 'com.changba.assistant'
     compileSdk 34
