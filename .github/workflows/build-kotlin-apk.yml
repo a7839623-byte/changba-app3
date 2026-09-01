@@ -22,8 +22,7 @@ jobs:
           java-version: '17'
           cache: 'gradle' # 自動快取，第二次打包只要 1 分鐘
 
-      # 3. 💥 核心防爆黑魔法：直接在雲端「無中生有」生出完美的 gradlew 執行檔
-      # 之前我們就是在這裡因為找不到檔案而掛掉，這次改用 gradle 官方內建的指令直接在雲端建立它
+      # 3. 核心防爆黑魔法：直接在雲端「無中生有」生出完美的 gradlew 執行檔
       - name: Generate Gradle Wrapper
         run: |
           gradle wrapper --gradle-version 8.1.1
@@ -33,7 +32,6 @@ jobs:
         run: chmod +x gradlew
 
       # 5. 執行原生 Android 打包指令（編譯最乾淨、最穩定的 Debug 版本 APK）
-      # 100% 自動合併 Manifest 權限，絕對不會發生 Flet 的權限灰底或全滅災難
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
